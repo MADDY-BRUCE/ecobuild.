@@ -1,0 +1,8 @@
+{
+  "name": "EcoBuild: Waste Management Platform",
+  "description": "A construction and illegal dumping waste management platform with AI image identification, GPS reporting, and secure verification for public and private sectors.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

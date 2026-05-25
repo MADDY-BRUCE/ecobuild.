@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: uid, name, mobile, role, aadhar, companyId
+    //
+    // Collection: reports
+    // Fields: id, reporterUid, type, category, amount, location, imageUrl, timestamp, status, nearestCenterId
+    //
+    // Collection: recyclingCenters
+    // Fields: id, name, location, acceptedCategories
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+         (request.auth.token.email == "senthamzils@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isLabor() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'labor' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'company');
+    }
+
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function getCompanyId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data['company id'];
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'role']) &&
+             data.role in ['admin', 'labor', 'public', 'company'];
+    }
+
+    function isValidReport(data) {
+      return data.keys().hasAll(['reporterUid', 'type', 'category', 'location', 'timestamp', 'status', 'urgency']) &&
+             data.type in ['illegal', 'professional'] &&
+             data.status in ['pending', 'in-progress', 'resolved'] &&
+             data.urgency in ['high', 'medium', 'low'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    match /reports/{reportId} {
+      // Public can see all reports (or you can restrict to same company later)
+      // Professional logs: ONLY Admins from the same company can read/list
+      allow read, list: if (
+        resource.data.type == 'illegal' || 
+        (isAdmin() && resource.data['company id'] == getCompanyId())
+      );
+      
+      allow create: if isValidReport(request.resource.data) && (
+        (request.resource.data.type == 'illegal') || 
+        (isAuthenticated() && request.resource.data['company id'] == getCompanyId())
+      );
+      
+      allow update: if (
+        (isAdmin() && resource.data['company id'] == getCompanyId()) || 
+        (isAuthenticated() && resource.data.reporterUid == request.auth.uid)
+      );
+      
+      allow delete: if isAdmin() && resource.data['company id'] == getCompanyId();
+    }
+
+    match /recyclingCenters/{centerId} {
+      allow read: if true; // Publicly readable for discovery
+      allow write: if isAdmin();
+    }
+  }
+}

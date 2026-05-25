@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile information including role and verification details.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "mobile": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "labor", "public"] },
+        "aadhar": { "type": "string", "description": "Simulated Aadhar number for public users." },
+        "companyId": { "type": "string", "description": "Associated company ID for professional users." }
+      },
+      "required": ["uid", "role"]
+    },
+    "WasteReport": {
+      "title": "Waste Report",
+      "description": "Report of waste disposal or illegal dumping.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reporterUid": { "type": "string" },
+        "type": { "type": "string", "enum": ["illegal", "professional"] },
+        "category": { "type": "string" },
+        "amount": { "type": "number", "description": "Amount of waste in tons/units (professional only)." },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" },
+            "address": { "type": "string" }
+          }
+        },
+        "imageUrl": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["pending", "in-progress", "resolved"] },
+        "nearestCenterId": { "type": "string" }
+      },
+      "required": ["reporterUid", "type", "category", "location", "timestamp", "status"]
+    },
+    "RecyclingCenter": {
+      "title": "Recycling Center",
+      "description": "Information about a recycling center.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" },
+            "address": { "type": "string" }
+          }
+        },
+        "acceptedCategories": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["name", "location", "acceptedCategories"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles and roles."
+    },
+    "/reports/{reportId}": {
+      "schema": "WasteReport",
+      "description": "Waste disposal and illegal dumping reports."
+    },
+    "/recyclingCenters/{centerId}": {
+      "schema": "RecyclingCenter",
+      "description": "List of available recycling centers."
+    }
+  }
+}
