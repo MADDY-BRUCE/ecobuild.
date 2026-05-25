@@ -174,22 +174,22 @@ export default function AdminDashboard({ profile }: { profile: UserProfile | nul
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-stone-400 text-[10px] uppercase tracking-[0.2em] font-bold">
-                  <th className="px-8 py-6">Type</th>
-                  <th className="px-8 py-6">Reporter</th>
-                  <th className="px-8 py-6">Category</th>
-                  <th className="px-8 py-6">Urgency</th>
-                  <th className="px-8 py-6">Amount</th>
-                  <th className="px-8 py-6">Pinpoint Location</th>
-                  <th className="px-8 py-6">Status</th>
-                  <th className="px-8 py-6">Timestamp</th>
-                  <th className="px-8 py-6">Actions</th>
+                <tr className="text-stone-400 text-[10px] uppercase tracking-[0.1em] font-bold">
+                  <th className="px-3 py-4">Type</th>
+                  <th className="px-3 py-4">Reporter</th>
+                  <th className="px-3 py-4">Category</th>
+                  <th className="px-3 py-4">Urgency</th>
+                  <th className="px-3 py-4">Amount</th>
+                  <th className="px-3 py-4">Pinpoint Location</th>
+                  <th className="px-3 py-4">Status</th>
+                  <th className="px-3 py-4">Timestamp</th>
+                  <th className="px-3 py-4">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-50">
                 {reports.map((report) => (
                   <tr key={report.id} className="group hover:bg-stone-50/50 transition-colors">
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <span className={cn(
                         "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
                         report.type === 'illegal' ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
@@ -197,7 +197,7 @@ export default function AdminDashboard({ profile }: { profile: UserProfile | nul
                         {report.type}
                       </span>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       {report.reporterDetails ? (
                         <div className="space-y-1">
                           <div className="text-sm font-bold text-brand-secondary">{report.reporterDetails.name}</div>
@@ -209,10 +209,10 @@ export default function AdminDashboard({ profile }: { profile: UserProfile | nul
                         <div className="text-xs font-medium text-stone-300 italic">Professional Log</div>
                       )}
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className="font-display font-bold text-brand-secondary">{report.category}</div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className={cn(
                         "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit",
                         report.urgency === 'high' ? "bg-red-100 text-red-600" : 
@@ -226,18 +226,18 @@ export default function AdminDashboard({ profile }: { profile: UserProfile | nul
                         {report.urgency}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className="text-sm font-bold text-brand-secondary">
                         {report.amount ? `${report.amount} ${report.unit || 'tons'}` : '-'}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className="flex items-center text-stone-500 text-sm font-medium">
                         <MapPin className="h-4 w-4 mr-2 text-brand-primary opacity-50" />
                         {report.location.address}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className={cn(
                         "flex items-center text-xs font-bold uppercase tracking-widest",
                         report.status === 'pending' ? "text-amber-600" : 
@@ -248,10 +248,10 @@ export default function AdminDashboard({ profile }: { profile: UserProfile | nul
                         {report.status}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-stone-400 text-xs font-medium">
+                    <td className="px-3 py-4 text-stone-400 text-xs font-medium">
                       {report.timestamp ? new Date((report.timestamp as any).seconds * 1000).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Just now'}
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-3 py-4">
                       <div className="flex items-center gap-2">
                         {report.status === 'pending' && (
                           <button 

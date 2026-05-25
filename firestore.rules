@@ -83,7 +83,8 @@ service cloud.firestore {
       );
       
       allow update: if (
-        (isAdmin() && resource.data['company id'] == getCompanyId()) || 
+        (isAdmin() && resource.data['company id'] == getCompanyId()) ||
+        (isAdmin() && resource.data.reporterUid == 'public-user') ||
         (isAuthenticated() && resource.data.reporterUid == request.auth.uid)
       );
       
