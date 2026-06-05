@@ -9,6 +9,8 @@ import PublicReport from './components/PublicReport';
 import CompanyPortal from './components/CompanyPortal';
 import AdminDashboard from './components/AdminDashboard';
 import LaborDashboard from './components/LaborDashboard';
+import RecyclingCenterPortal from './components/RecyclingCenterPortal';
+import SuperAdminPortal from './components/SuperAdminPortal';
 import { UserProfile } from './types';
 
 export default function App() {
@@ -75,6 +77,8 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/public-report" element={<PublicReport />} />
             <Route path="/company-portal" element={<CompanyPortal />} />
+            <Route path="/recycling-center" element={<RecyclingCenterPortal />} />
+            <Route path="/super-admin" element={<SuperAdminPortal />} />
             
             {/* Protected Routes */}
             <Route 

@@ -30,13 +30,18 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() && 
         ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-         (request.auth.token.email == "senthamzils@gmail.com" && request.auth.token.email_verified == true));
+         (request.auth.token.email == "maddybruce007@gmail.com" || request.auth.token.email == "senthamzils@gmail.com"));
     }
 
     function isLabor() {
       return isAuthenticated() && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'labor' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'company');
+    }
+
+    function isRecyclingCenter() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/recyclingCenters/$(request.auth.uid));
     }
 
     function getRole() {
@@ -85,7 +90,8 @@ service cloud.firestore {
       allow update: if (
         (isAdmin() && resource.data['company id'] == getCompanyId()) ||
         (isAdmin() && resource.data.reporterUid == 'public-user') ||
-        (isAuthenticated() && resource.data.reporterUid == request.auth.uid)
+        (isAuthenticated() && resource.data.reporterUid == request.auth.uid) ||
+        (isRecyclingCenter() && resource.data.type == 'illegal')
       );
       
       allow delete: if isAdmin() && resource.data['company id'] == getCompanyId();
@@ -93,7 +99,9 @@ service cloud.firestore {
 
     match /recyclingCenters/{centerId} {
       allow read: if true; // Publicly readable for discovery
-      allow write: if isAdmin();
+      // Allow: super admin, OR the authenticated user writing their own document (uid must match doc path)
+      allow create: if isAuthenticated() && request.auth.uid == centerId;
+      allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == centerId);
     }
   }
 }
